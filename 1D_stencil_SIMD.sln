@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33815.320
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1D_stencil_SIMD", "1D_stencil_SIMD.vcxproj", "{5E14916B-8D7C-494B-B18C-99A8B695DFD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Debug|x64.ActiveCfg = Debug|x64
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Debug|x64.Build.0 = Debug|x64
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Debug|x86.ActiveCfg = Debug|Win32
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Debug|x86.Build.0 = Debug|Win32
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Release|x64.ActiveCfg = Release|x64
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Release|x64.Build.0 = Release|x64
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Release|x86.ActiveCfg = Release|Win32
+		{5E14916B-8D7C-494B-B18C-99A8B695DFD0}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {22E2345B-26E9-49A7-AF03-CD9FD73DDED2}
+	EndGlobalSection
+EndGlobal
