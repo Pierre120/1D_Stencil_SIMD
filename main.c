@@ -4,6 +4,32 @@
 #include <time.h>
 
 
+/* @brief x86-64 SIMD assembly function for 1-D stencil operation on 1 vector.
+* 
+* Linked to an assembly file consisting the code implementation of 1-D stencil
+* in SIMD assembly.
+* 
+* @param Y The address of the output vector
+* @param X The address of the input vector
+* @param n number of elements of the vector
+* @return Void
+*/
+extern void stencil_1D_x86_64_SIMD(int n, long long int* Y, long long int* X);
+
+
+/* @brief x86-64 assembly function for 1-D stencil operation on 1 vector.
+* 
+* Linked to an assembly file consisting the code implementation of 1-D stencil
+* in assembly.
+* 
+* @param Y The address of the output vector
+* @param X The address of the input vector
+* @param n number of elements of the vector
+* @return Void
+*/
+extern void stencil_1D_x86_64(int n, long long int* Y, long long int* X);
+
+
 /* @brief C function for 1-D stencil operation on 1 vector.
 * 
 * 1-D stencil operation is defined as: 
@@ -63,7 +89,7 @@ unsigned int count_err(long long int* Y, long long int* X, int n) {
 
 
 int main(void) {
-	const int n = 1<<24; // 1<<20; 1<<24; 1<<30
+	const int n = 1<<20; // 1<<20; 1<<24; 1<<30
 	const long long int N_BYTES = n * sizeof(long long int); // bytes to be allocated for each vector
 	const int RUN_COUNT = 30; // number of runs
 
@@ -105,7 +131,7 @@ int main(void) {
 	clock_t start, end;
 	double time_taken = 0;
 
-	// Run 1-D stencil using C
+	// === Implement 1-D stencil using C ===
 	printf("-- C --\n");
 	for (int i = 0; i < RUN_COUNT; i++) {
 		start = clock();
@@ -119,9 +145,54 @@ int main(void) {
 	time_taken = time_taken / (double)RUN_COUNT;
 	printf("Average execution time in microseconds (C program):  %lf uS\n", time_taken);
 
+	// Debugging purposes: Print first 6 non-halo elements
+	printf("Output (first 10 non-halo elements)");
+	for (int i = 0; i < 10; i++) {
+		printf("%lld ", Y[i + 3]);
+	}
+	printf("\n");
+
 	// Count and display number of errors (i.e. output results not equal to expected output)
 	unsigned int err_count = count_err(Y, X, n);
 	printf("Error Count (C program):  %u\n\n", err_count);
+
+	// Reset time and counter values
+	time_taken = 0;
+	err_count = 0;
+
+	// For making sure: Reset Y vector
+	for (int i = 3; i < n - 3; i++) {
+		Y[i] = 0L;
+	}
+
+
+
+	// === Implement 1-D stencil using x86-64 assembly ===
+	printf("-- x86-64 --\n");
+	for (int i = 0; i < RUN_COUNT; i++) {
+		start = clock();
+		stencil_1D_x86_64(n, Y, X);
+		end = clock();
+		// Total execution time
+		time_taken += ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC; // in microseconds
+	}
+
+	// Calculate and display average execution time
+	time_taken = time_taken / (double)RUN_COUNT;
+	printf("Average execution time in microseconds (x86-64 program):  %lf uS\n", time_taken);
+
+	// Debugging purposes: Print first 6 non-halo elements
+	printf("Output (first 10 non-halo elements)");
+	for (int i = 0; i < 10; i++) {
+		printf("%lld ", Y[i + 3]);
+	}
+	printf("\n");
+
+	// Count and display number of errors (i.e. output results not equal to expected output)
+	err_count = count_err(Y, X, n);
+	printf("Error Count (x86-64 program):  %u\n\n", err_count);
+
+
 
 	return 0;
 }
