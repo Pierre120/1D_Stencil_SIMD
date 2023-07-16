@@ -95,6 +95,10 @@ int main(void) {
 	const long long int N_BYTES = n * sizeof(long long int); // bytes to be allocated for each vector
 	const int RUN_COUNT = 30; // number of runs
 
+	// timer variables
+	clock_t start, end, control;
+	double time_taken = 0;
+
 	// Allocate memory for vectors
 	long long int *X, *Y;
 	X = (long long int*)malloc(N_BYTES);
@@ -124,9 +128,7 @@ int main(void) {
 	printf("Byte size per vector:  %lld\n", N_BYTES);
 	printf("Number of runs:  %d\n\n", RUN_COUNT);
 
-	// timer variables
-	clock_t start, end;
-	double time_taken = 0;
+
 
 	// === Implement 1-D stencil using C ===
 	printf("-- C version --\n");
@@ -134,6 +136,7 @@ int main(void) {
 		start = clock();
 		stencil_1D_C(Y, X, n);
 		end = clock();
+		control = clock(); // calibration for clock
 		// Total execution time
 		time_taken += ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC; // in microseconds
 	}
@@ -143,7 +146,7 @@ int main(void) {
 	printf("Average execution time in microseconds (C program):  %lf uS\n", time_taken);
 
 	// Debugging purposes: Print first 6 non-halo elements
-	printf("Output (first 10 non-halo elements)");
+	printf("Output (first 10 non-halo elements): ");
 	for (int i = 0; i < 10; i++) {
 		printf("%lld ", Y[i + 3]);
 	}
@@ -157,8 +160,9 @@ int main(void) {
 	time_taken = 0;
 	err_count = 0;
 
-	// Reset Y vector
-	for (int i = 0; i < n - 1; i++) {
+	// Reinitialize X and Y vectors
+	for (int i = 0; i < n; i++) {
+		X[i] = (long long int)(i + 1);
 		Y[i] = 0L;
 	}
 
@@ -167,9 +171,11 @@ int main(void) {
 	// === Implement 1-D stencil using x86-64 assembly ===
 	printf("-- x86-64 version --\n");
 	for (int i = 0; i < RUN_COUNT; i++) {
+		//printf("%ld", start);
 		start = clock();
 		stencil_1D_x86_64(n, Y, X);
 		end = clock();
+		control = clock(); // calibration for clock
 		// Total execution time
 		time_taken += ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC; // in microseconds
 	}
@@ -179,7 +185,7 @@ int main(void) {
 	printf("Average execution time in microseconds (x86-64 program):  %lf uS\n", time_taken);
 
 	// Debugging purposes: Print first 6 non-halo elements
-	printf("Output (first 10 non-halo elements)");
+	printf("Output (first 10 non-halo elements): ");
 	for (int i = 0; i < 10; i++) {
 		printf("%lld ", Y[i + 3]);
 	}
@@ -193,19 +199,21 @@ int main(void) {
 	time_taken = 0;
 	err_count = 0;
 
-	// Reset Y vector
-	for (int i = 0; i < n - 1; i++) {
+	// Reinitialize X and Y vectors
+	for (int i = 0; i < n; i++) {
+		X[i] = (long long int)(i + 1);
 		Y[i] = 0L;
 	}
 
 
-
+	printf("Clocks per second = %ld", CLOCKS_PER_SEC);
 	// === Implement 1-D stencil using x86-64 SIMD assembly ===
 	printf("-- x86-64 SIMD version --\n");
 	for (int i = 0; i < RUN_COUNT; i++) {
 		start = clock();
 		stencil_1D_x86_64_SIMD(n, Y, X);
 		end = clock();
+		control = clock(); // calibration for clock
 		// Total execution time
 		time_taken += ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC; // in microseconds
 	}
@@ -215,7 +223,7 @@ int main(void) {
 	printf("Average execution time in microseconds (x86-64 SIMD program):  %lf uS\n", time_taken);
 
 	// Debugging purposes: Print first 6 non-halo elements
-	printf("Output (first 10 non-halo elements)");
+	printf("Output (first 10 non-halo elements): ");
 	for (int i = 0; i < 10; i++) {
 		printf("%lld ", Y[i + 3]);
 	}
