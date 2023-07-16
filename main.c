@@ -91,7 +91,7 @@ unsigned int count_err(long long int* Y, long long int* X, int n) {
 
 
 int main(void) {
-	const int n = 1<<28; // 1<<20; 1<<24; 1<<30
+	const int n = 1<<20; // 1<<20; 1<<24; 1<<28
 	const long long int N_BYTES = n * sizeof(long long int); // bytes to be allocated for each vector
 	const int RUN_COUNT = 30; // number of runs
 
