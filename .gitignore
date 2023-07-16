@@ -54,3 +54,4 @@ dkms.conf
 ipch/
 *.opendb
 *.opensdf
+x64/
