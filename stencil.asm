@@ -5,7 +5,7 @@ global stencil_1D_x86_64
 
 stencil_1D_x86_64:
 ; number of times to loop
-sub rcx, 6 ; max: n - 6
+sub rcx, 6 ; max: n - 6 (excluding 6 halo elements)
 ; starting index of 2nd param - Y vector
 add rdx, 24 ; 3rd index (8 bytes * 3)
 

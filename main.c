@@ -81,6 +81,8 @@ unsigned int count_err(long long int* Y, long long int* X, int n) {
 	for (int i = 3; i < last_ind; i++) {
 		if (Y[i] != (X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2] + X[i + 3])) {
 			err_count++;
+			printf("Error at index [%d]: output = % lld; expected = % lld\n", i, Y[i], 
+				X[i - 3] + X[i - 2] + X[i - 1] + X[i] + X[i + 1] + X[i + 2] + X[i + 3]);
 		}
 	}
 
@@ -89,7 +91,7 @@ unsigned int count_err(long long int* Y, long long int* X, int n) {
 
 
 int main(void) {
-	const int n = 1<<20; // 1<<20; 1<<24; 1<<30
+	const int n = 1<<24; // 1<<20; 1<<24; 1<<30
 	const long long int N_BYTES = n * sizeof(long long int); // bytes to be allocated for each vector
 	const int RUN_COUNT = 30; // number of runs
 
@@ -110,16 +112,11 @@ int main(void) {
 		return 1; // return with  1 error;
 	}
 
-	// Initialize X vector
+	// Initialize X and Y vectors
 	for (int i = 0; i < n; i++) {
 		X[i] = (long long int)(i + 1);
+		Y[i] = 0L;
 	}
-
-	// Assign value of 0 for the first and last 3 elements, which are the halo elements.
-	// This is due to the given formula, in which performing that on the first and last
-	// 3 elements will cause an out-of-bounds accessing of the vectors.
-	Y[0] = Y[1] = Y[2] = 0L; // first 3 halo elements
-	Y[n - 1] = Y[n - 2] = Y[n - 3] = 0L; // last 3 halo elements
 
 	// Display current specs
 	printf("\n=== 1-D Stencil ===\n");
@@ -132,7 +129,7 @@ int main(void) {
 	double time_taken = 0;
 
 	// === Implement 1-D stencil using C ===
-	printf("-- C --\n");
+	printf("-- C version --\n");
 	for (int i = 0; i < RUN_COUNT; i++) {
 		start = clock();
 		stencil_1D_C(Y, X, n);
@@ -160,15 +157,15 @@ int main(void) {
 	time_taken = 0;
 	err_count = 0;
 
-	// For making sure: Reset Y vector
-	for (int i = 3; i < n - 3; i++) {
+	// Reset Y vector
+	for (int i = 0; i < n - 1; i++) {
 		Y[i] = 0L;
 	}
 
 
 
 	// === Implement 1-D stencil using x86-64 assembly ===
-	printf("-- x86-64 --\n");
+	printf("-- x86-64 version --\n");
 	for (int i = 0; i < RUN_COUNT; i++) {
 		start = clock();
 		stencil_1D_x86_64(n, Y, X);
@@ -192,7 +189,47 @@ int main(void) {
 	err_count = count_err(Y, X, n);
 	printf("Error Count (x86-64 program):  %u\n\n", err_count);
 
+	// Reset time and counter values
+	time_taken = 0;
+	err_count = 0;
 
+	// Reset Y vector
+	for (int i = 0; i < n - 1; i++) {
+		Y[i] = 0L;
+	}
+
+
+
+	// === Implement 1-D stencil using x86-64 SIMD assembly ===
+	printf("-- x86-64 SIMD version --\n");
+	for (int i = 0; i < RUN_COUNT; i++) {
+		start = clock();
+		stencil_1D_x86_64_SIMD(n, Y, X);
+		end = clock();
+		// Total execution time
+		time_taken += ((double)(end - start)) * 1e6 / CLOCKS_PER_SEC; // in microseconds
+	}
+
+	// Calculate and display average execution time
+	time_taken = time_taken / (double)RUN_COUNT;
+	printf("Average execution time in microseconds (x86-64 SIMD program):  %lf uS\n", time_taken);
+
+	// Debugging purposes: Print first 6 non-halo elements
+	printf("Output (first 10 non-halo elements)");
+	for (int i = 0; i < 10; i++) {
+		printf("%lld ", Y[i + 3]);
+	}
+	printf("\n");
+
+	// Count and display number of errors (i.e. output results not equal to expected output)
+	err_count = count_err(Y, X, n);
+	printf("Error Count (x86-64 SIMD program):  %u\n\n", err_count);
+
+
+
+	// Deallocate X and Y vectors from memory
+	free(X);
+	free(Y);
 
 	return 0;
 }

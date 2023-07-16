@@ -23,5 +23,8 @@
     <CustomBuild Include="stencil.asm">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="stencil_SIMD.asm">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>
